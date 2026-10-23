@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Project } from "@/lib/types";
+import { DEMO_MODE, demoSave } from "@/lib/demo";
 
 export type SaveState = "idle" | "dirty" | "saving" | "saved" | "error";
 
@@ -21,6 +22,11 @@ export function useProject(initial: Project) {
   const persist = useCallback(async (p: Project) => {
     setSaveState("saving");
     try {
+      if (DEMO_MODE) {
+        demoSave(p);
+        setSaveState("saved");
+        return;
+      }
       const res = await fetch(`/api/projects/${p.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },

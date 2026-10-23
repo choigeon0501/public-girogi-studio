@@ -67,9 +67,8 @@ export function Step5Preview({ project }: { project: Project }) {
       <div className="card space-y-3">
         {RENDER_DISABLED ? (
           <div className="text-sm text-ink-2">
-            <div className="font-medium text-ink">MP4 렌더는 이 서버에서 지원하지 않습니다</div>
-            위 미리보기가 최종 영상과 같은 화면입니다. 파일이 필요하면 프로젝트를 받아 로컬에서{" "}
-            <code className="rounded bg-paper-2 px-1">npm run render -- {project.id}</code> 를 실행하세요.
+            <div className="font-medium text-ink">체험판에서는 MP4 파일 만들기를 지원하지 않습니다</div>
+            위 미리보기가 완성될 영상과 같은 화면입니다. 실제 서비스에서는 여기서 영상 파일을 받을 수 있습니다.
           </div>
         ) : (
           <div className="flex flex-wrap items-center gap-3">

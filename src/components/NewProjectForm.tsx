@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { DEMO_MODE, demoSave } from "@/lib/demo";
+import { buildNewProject } from "@/lib/newProject";
 
 export function NewProjectForm() {
   const router = useRouter();
@@ -15,6 +17,11 @@ export function NewProjectForm() {
     setBusy(true);
     setErr(null);
     try {
+      if (DEMO_MODE) {
+        const p = demoSave(buildNewProject({ title, ownerName }));
+        router.push(`/p/${p.id}/step/1`);
+        return;
+      }
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

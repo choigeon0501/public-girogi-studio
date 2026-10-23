@@ -2,10 +2,14 @@ import Link from "next/link";
 import { listProjects } from "@/lib/store";
 import { NewProjectForm } from "@/components/NewProjectForm";
 import { formatDuration, planScenes } from "@/lib/scenes";
+import { DemoHome } from "@/components/demo/DemoHome";
+
+const DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === "1";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  if (DEMO) return <DemoHome />;
   let projects: Awaited<ReturnType<typeof listProjects>> = [];
   let storageError: string | null = null;
   try {

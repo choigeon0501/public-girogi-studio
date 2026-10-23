@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { newId } from "@/lib/ids";
+import { DEMO_MODE, fileToDataUrl } from "@/lib/demo";
 import { splitSentences, storyText } from "@/lib/scenes";
 import { MAX_PHOTOS_PER_BLOCK, PHOTO_CAPTION_MAX, type Block, type Photo } from "@/lib/types";
 import type { StepProps } from "./Wizard";
@@ -137,6 +138,11 @@ function PhotoEditor({
     const next = [...photos];
     try {
       for (const file of Array.from(files).slice(0, remaining)) {
+        if (DEMO_MODE) {
+          // 데모: 서버 없이 브라우저에서 줄여 data URL로 보관
+          next.push({ id: newId("ph"), src: await fileToDataUrl(file), caption: "", order: next.length });
+          continue;
+        }
         const fd = new FormData();
         fd.append("projectId", projectId);
         fd.append("file", file);

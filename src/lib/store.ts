@@ -1,8 +1,7 @@
 import path from "node:path";
-import { CATALOG } from "./catalog";
-import { newId } from "./ids";
 import { getStorage } from "./storage";
-import { DEFAULT_STYLE, type Block, type Project } from "./types";
+import { buildNewProject } from "./newProject";
+import type { Project } from "./types";
 
 const ROOT = process.cwd();
 export const UPLOAD_DIR = path.join(ROOT, "public", "uploads");
@@ -34,30 +33,7 @@ export async function saveProject(project: Project): Promise<Project> {
 
 /** 기본 켜짐 블록으로 채운 새 프로젝트 */
 export async function createProject(input: { title?: string; ownerName?: string }): Promise<Project> {
-  const now = new Date().toISOString();
-  const blocks: Block[] = CATALOG.filter((c) => c.defaultOn)
-    .sort((a, b) => a.position - b.position)
-    .map((c) => ({
-      id: newId("blk"),
-      catalogId: c.id,
-      type: c.type,
-      title: c.title,
-      description: "",
-      prompts: c.prompts,
-      photos: [],
-    }));
-
-  const project: Project = {
-    id: newId("prj"),
-    title: input.title?.trim() || "나의 이야기",
-    ownerName: input.ownerName?.trim() || "",
-    createdAt: now,
-    updatedAt: now,
-    blocks,
-    style: { ...DEFAULT_STYLE },
-    renders: [],
-  };
-  return saveProject(project);
+  return saveProject(buildNewProject(input));
 }
 
 /** 업로드 사진 저장. 반환값은 웹에서 쓰는 src (/api/files/...) */
