@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { RENDER_ENABLED } from "@/lib/storage";
 
-export const maxDuration = 600;
+// Vercel Hobby 상한이 300초. (Vercel에서는 렌더 자체가 비활성)
+export const maxDuration = 300;
 
 /** 1차: 동기 렌더. 수 분 걸릴 수 있다. 2차에서 큐로 이전. Vercel 서버리스에서는 비활성. */
 export async function POST(req: Request) {
