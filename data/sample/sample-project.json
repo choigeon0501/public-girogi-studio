@@ -1,0 +1,84 @@
+{
+  "id": "prj_0e450bfb",
+  "title": "테스트 자서전",
+  "ownerName": "김영희",
+  "createdAt": "2026-10-23T04:45:42.536Z",
+  "updatedAt": "2026-10-23T04:46:25.743Z",
+  "blocks": [
+    {
+      "id": "blk_37679bd6",
+      "catalogId": "childhood",
+      "type": "period",
+      "title": "소년기",
+      "approxYear": "1960년대",
+      "description": "부산 영도의 작은 골목에서 자랐습니다. 바다가 보이는 언덕이 우리 놀이터였습니다. 학교 가는 길엔 늘 갈매기가 따라왔습니다.",
+      "prompts": [
+        "가장 친했던 친구는 누구였나요?",
+        "학교 가는 길은 어땠나요?",
+        "그 시절 가장 좋아하던 놀이는요?"
+      ],
+      "photos": [
+        {
+          "id": "ph1",
+          "src": "/api/files/prj_0e450bfb/ph_6ff518fc.jpg",
+          "year": "1965",
+          "people": "어머니와",
+          "place": "영도",
+          "caption": "어머니 손을 잡고 처음 바다를 본 날입니다.",
+          "order": 0
+        },
+        {
+          "id": "ph2",
+          "src": "/api/files/prj_0e450bfb/ph_346f3b20.jpg",
+          "year": "1968",
+          "caption": "",
+          "order": 1
+        }
+      ]
+    },
+    {
+      "id": "blk_59633eb4",
+      "catalogId": "happiest",
+      "type": "moment",
+      "title": "가장 행복했던 때",
+      "approxYear": "1989",
+      "description": "첫째가 태어나던 날, 병원 복도에서 들은 울음소리를 아직도 기억합니다.",
+      "prompts": [
+        "언제, 어디서였나요?",
+        "누구와 함께였나요?",
+        "왜 그 순간이 가장 행복했나요?"
+      ],
+      "photos": []
+    },
+    {
+      "id": "blk_5bcc8594",
+      "catalogId": "now",
+      "type": "period",
+      "title": "지금의 나",
+      "description": "",
+      "prompts": [
+        "요즘 어떻게 지내시나요?",
+        "지금 가장 소중한 것은 무엇인가요?"
+      ],
+      "photos": []
+    },
+    {
+      "id": "blk_0befc21f",
+      "catalogId": "legacy",
+      "type": "moment",
+      "title": "남기고 싶은 말",
+      "description": "얘들아, 엄마는 너희가 있어서 행복했다.",
+      "prompts": [
+        "누구에게 남기고 싶은가요?",
+        "꼭 전하고 싶은 한마디는요?"
+      ],
+      "photos": []
+    }
+  ],
+  "style": {
+    "subtitle": "classic",
+    "bgm": "piano",
+    "aspect": "16:9"
+  },
+  "renders": []
+}
