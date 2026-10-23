@@ -1,44 +1,34 @@
-import { promises as fs } from "node:fs";
 import path from "node:path";
 import { CATALOG } from "./catalog";
 import { newId } from "./ids";
+import { getStorage } from "./storage";
 import { DEFAULT_STYLE, type Block, type Project } from "./types";
 
 const ROOT = process.cwd();
-export const DATA_DIR = path.join(ROOT, "data", "projects");
 export const UPLOAD_DIR = path.join(ROOT, "public", "uploads");
 export const OUT_DIR = path.join(ROOT, "out");
 
-async function ensureDir(dir: string) {
-  await fs.mkdir(dir, { recursive: true });
-}
-
-function filePath(id: string) {
+function assertId(id: string) {
   if (!/^[a-zA-Z0-9_-]+$/.test(id)) throw new Error("invalid project id");
-  return path.join(DATA_DIR, `${id}.json`);
 }
 
 export async function listProjects(): Promise<Project[]> {
-  await ensureDir(DATA_DIR);
-  const files = (await fs.readdir(DATA_DIR)).filter((f) => f.endsWith(".json"));
-  const projects = await Promise.all(
-    files.map(async (f) => JSON.parse(await fs.readFile(path.join(DATA_DIR, f), "utf8")) as Project),
-  );
+  const s = await getStorage();
+  const projects = await s.listJson<Project>("projects/");
   return projects.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
 export async function getProject(id: string): Promise<Project | null> {
-  try {
-    return JSON.parse(await fs.readFile(filePath(id), "utf8")) as Project;
-  } catch {
-    return null;
-  }
+  assertId(id);
+  const s = await getStorage();
+  return s.getJson<Project>(`projects/${id}.json`);
 }
 
 export async function saveProject(project: Project): Promise<Project> {
-  await ensureDir(DATA_DIR);
+  assertId(project.id);
+  const s = await getStorage();
   const next = { ...project, updatedAt: new Date().toISOString() };
-  await fs.writeFile(filePath(project.id), JSON.stringify(next, null, 2), "utf8");
+  await s.putJson(`projects/${project.id}.json`, next);
   return next;
 }
 
@@ -70,8 +60,16 @@ export async function createProject(input: { title?: string; ownerName?: string 
   return saveProject(project);
 }
 
-export async function uploadDirFor(projectId: string) {
-  const dir = path.join(UPLOAD_DIR, projectId);
-  await ensureDir(dir);
-  return dir;
+/** 업로드 사진 저장. 반환값은 웹에서 쓰는 src (/api/files/...) */
+export async function saveUpload(projectId: string, name: string, body: Buffer, contentType: string) {
+  assertId(projectId);
+  const s = await getStorage();
+  await s.putFile(`uploads/${projectId}/${name}`, body, contentType);
+  return `/api/files/${projectId}/${name}`;
+}
+
+export async function readUpload(projectId: string, name: string) {
+  assertId(projectId);
+  const s = await getStorage();
+  return s.getFile(`uploads/${projectId}/${name}`);
 }

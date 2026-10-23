@@ -39,3 +39,20 @@ npm run dev                      # http://localhost:3002
 - 렌더는 1차에서 **동기 실행**입니다. 사진 수에 따라 수 분 걸립니다. 2차에서 큐로 옮깁니다.
 - 배경음악 파일이 없으면 자동으로 무음으로 렌더됩니다.
 - 한글 폰트는 시스템 폰트를 씁니다(Pretendard/Apple SD Gothic Neo/나눔명조). 서버 렌더 환경에 폰트가 없으면 `@remotion/google-fonts`로 교체하세요.
+
+## Vercel에 올리기 (미리보기용)
+
+Vercel 서버리스에는 파일을 쓸 수 없으므로 저장소를 **Vercel Blob**으로 바꿔 동작합니다. MP4 서버 렌더는 비활성(미리보기 플레이어는 동작).
+
+1. GitHub 저장소를 Vercel에 Import (Framework: Next.js, 기본 설정 그대로)
+2. 프로젝트 → **Storage → Create → Blob** 으로 Blob 스토어 하나 연결  
+   → `BLOB_READ_WRITE_TOKEN` 환경변수가 자동으로 들어가고, 앱이 이를 감지해 Blob 저장소를 씁니다
+3. Redeploy
+
+로컬 개발은 토큰이 없으면 자동으로 파일 저장소(`data/`, `public/uploads/`)를 씁니다.
+로컬에서도 Blob을 쓰려면 `vercel env pull .env.local` 로 토큰을 받아오면 됩니다.
+
+| 환경 | 저장소 | MP4 렌더 |
+|---|---|---|
+| 로컬 / 일반 서버 | 파일 | 가능 |
+| Vercel | Blob | 불가 (미리보기만) |

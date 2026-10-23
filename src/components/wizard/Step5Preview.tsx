@@ -6,6 +6,8 @@ import { Autobiography } from "@/remotion/Autobiography";
 import { FPS, HEIGHT, WIDTH, formatDuration, planScenes, storyText } from "@/lib/scenes";
 import type { Project, RenderRecord } from "@/lib/types";
 
+const RENDER_DISABLED = process.env.NEXT_PUBLIC_RENDER_DISABLED === "1";
+
 export function Step5Preview({ project }: { project: Project }) {
   const plan = useMemo(() => planScenes(project), [project]);
   const empty = project.blocks.filter((b) => !storyText(b).trim() && b.photos.length === 0);
@@ -63,14 +65,22 @@ export function Step5Preview({ project }: { project: Project }) {
       </p>
 
       <div className="card space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <button className="btn-primary" onClick={render} disabled={busy}>
-            {busy ? "영상 만드는 중… (수 분 걸립니다)" : "영상 만들기 (MP4)"}
-          </button>
-          <span className="text-xs text-ink-3">
-            또는 터미널에서 <code>npm run render -- {project.id}</code>
-          </span>
-        </div>
+        {RENDER_DISABLED ? (
+          <div className="text-sm text-ink-2">
+            <div className="font-medium text-ink">MP4 렌더는 이 서버에서 지원하지 않습니다</div>
+            위 미리보기가 최종 영상과 같은 화면입니다. 파일이 필요하면 프로젝트를 받아 로컬에서{" "}
+            <code className="rounded bg-paper-2 px-1">npm run render -- {project.id}</code> 를 실행하세요.
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center gap-3">
+            <button className="btn-primary" onClick={render} disabled={busy}>
+              {busy ? "영상 만드는 중… (수 분 걸립니다)" : "영상 만들기 (MP4)"}
+            </button>
+            <span className="text-xs text-ink-3">
+              또는 터미널에서 <code>npm run render -- {project.id}</code>
+            </span>
+          </div>
+        )}
         {err && <p className="text-sm text-red-600">{err}</p>}
 
         {renders.length > 0 && (
