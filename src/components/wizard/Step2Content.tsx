@@ -143,7 +143,7 @@ function PhotoEditor({
         const res = await fetch("/api/upload", { method: "POST", body: fd });
         if (!res.ok) {
           const j = await res.json().catch(() => ({}));
-          throw new Error(j.error ?? "업로드 실패");
+          throw new Error(j.error ?? `업로드 실패 (${res.status})`);
         }
         const { src } = await res.json();
         next.push({ id: newId("ph"), src, caption: "", order: next.length });

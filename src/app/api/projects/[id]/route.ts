@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getProject, saveProject } from "@/lib/store";
+import { errorMessage } from "@/lib/storage";
 import { MAX_PHOTOS_PER_BLOCK, PHOTO_CAPTION_MAX } from "@/lib/types";
 
 const PhotoSchema = z.object({
@@ -43,21 +44,30 @@ const ProjectPatchSchema = z.object({
 type Ctx = { params: Promise<{ id: string }> };
 
 export async function GET(_req: Request, { params }: Ctx) {
-  const { id } = await params;
-  const project = await getProject(id);
-  if (!project) return NextResponse.json({ error: "not found" }, { status: 404 });
-  return NextResponse.json(project);
+  try {
+    const { id } = await params;
+    const project = await getProject(id);
+    if (!project) return NextResponse.json({ error: "not found" }, { status: 404 });
+    return NextResponse.json(project);
+  } catch (e) {
+    return NextResponse.json({ error: errorMessage(e) }, { status: 500 });
+  }
 }
 
 export async function PUT(req: Request, { params }: Ctx) {
-  const { id } = await params;
-  const project = await getProject(id);
-  if (!project) return NextResponse.json({ error: "not found" }, { status: 404 });
+  try {
+    const { id } = await params;
+    const project = await getProject(id);
+    if (!project) return NextResponse.json({ error: "not found" }, { status: 404 });
 
-  const parsed = ProjectPatchSchema.safeParse(await req.json());
-  if (!parsed.success) {
-    return NextResponse.json({ error: "invalid", issues: parsed.error.issues }, { status: 400 });
+    const parsed = ProjectPatchSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "invalid", issues: parsed.error.issues }, { status: 400 });
+    }
+    const saved = await saveProject({ ...project, ...parsed.data });
+    return NextResponse.json(saved);
+  } catch (e) {
+    console.error("[projects:PUT]", e);
+    return NextResponse.json({ error: errorMessage(e) }, { status: 500 });
   }
-  const saved = await saveProject({ ...project, ...parsed.data });
-  return NextResponse.json(saved);
 }

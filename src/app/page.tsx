@@ -6,7 +6,13 @@ import { formatDuration, planScenes } from "@/lib/scenes";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const projects = await listProjects();
+  let projects: Awaited<ReturnType<typeof listProjects>> = [];
+  let storageError: string | null = null;
+  try {
+    projects = await listProjects();
+  } catch (e) {
+    storageError = e instanceof Error ? e.message : String(e);
+  }
 
   return (
     <div className="space-y-10">
@@ -17,6 +23,10 @@ export default async function HomePage() {
           지금은 AI 없이 고정 템플릿으로 만드는 1차 버전입니다.
         </p>
       </section>
+
+      {storageError && (
+        <section className="card max-w-xl border-red-200 bg-red-50 text-sm text-red-700">{storageError}</section>
+      )}
 
       <section className="card max-w-xl">
         <h2 className="mb-3 font-medium">새 자서전 시작하기</h2>
