@@ -12,6 +12,7 @@ import {
   type StudioPhoto,
 } from "@/lib/studio";
 import { StepFooter } from "./StudioShell";
+import { MotionIntroModal, hasSeenMotionIntro, markMotionIntroSeen } from "./MotionIntroModal";
 
 export function PhotosStep() {
   const { project, concept, update, loaded } = useStudio();
@@ -20,6 +21,8 @@ export function PhotosStep() {
   const [dragId, setDragId] = useState<string | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  /** 첫 '움직이게' 클릭 시 안내 팝업. pendingId = 확인 후 적용할 사진 */
+  const [intro, setIntro] = useState<{ pendingId: string | null } | null>(null);
 
   if (!loaded) return <p className="text-sm text-ink-3">불러오는 중…</p>;
   if (!concept) {
@@ -68,7 +71,18 @@ export function PhotosStep() {
       return;
     }
     setErr(null);
+    // 처음 켤 때 한 번만 설명 팝업 → 확인하면 적용
+    if (!target.motion && !hasSeenMotionIntro()) {
+      setIntro({ pendingId: id });
+      return;
+    }
     patch(id, (p) => ({ ...p, motion: !p.motion }));
+  }
+  function confirmIntro() {
+    markMotionIntroSeen();
+    const id = intro?.pendingId;
+    setIntro(null);
+    if (id) patch(id, (p) => ({ ...p, motion: true }));
   }
   function reorder(id: string, toIndex: number) {
     update((p) => {
@@ -105,6 +119,15 @@ export function PhotosStep() {
           <span className="text-ink-3">
             사진 <b className="text-ink">{photos.length}</b>/{MAX_PHOTOS} · ✦ 움직이는 사진{" "}
             <b className="text-ink">{motionCount}</b>/{MAX_MOTION}
+            <button
+              type="button"
+              onClick={() => setIntro({ pendingId: null })}
+              className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full border border-line text-[10px] text-ink-3 hover:border-ink hover:text-ink"
+              title="움직이는 사진이란?"
+              aria-label="움직이는 사진 설명 보기"
+            >
+              ?
+            </button>
           </span>
           <label className={clsx("btn-primary cursor-pointer", (uploading || remaining <= 0) && "pointer-events-none opacity-50")}>
             {uploading ? "올리는 중…" : remaining > 0 ? "사진 추가" : "최대 장수"}
@@ -250,6 +273,18 @@ export function PhotosStep() {
             </li>
           )}
         </ol>
+      )}
+
+      {intro && (
+        <MotionIntroModal
+          photoSrc={photos.find((p) => p.id === intro.pendingId)?.src ?? photos[0]?.src ?? null}
+          onConfirm={intro.pendingId ? confirmIntro : undefined}
+          onClose={() => {
+            // 설명만 본 경우에도 '봤음'으로 기록
+            markMotionIntroSeen();
+            setIntro(null);
+          }}
+        />
       )}
 
       <StepFooter
